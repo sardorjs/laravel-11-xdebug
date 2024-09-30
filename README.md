@@ -1,4 +1,9 @@
-# Setup | Laravel 11 Project in Docker
+![Result](https://img001.prntscr.com/file/img001/S__6SNG3RM--XuePtV6k4Q.png)
+### [Source](https://habr.com/ru/articles/712670/?code=46ec49e7865a774bc73c89adf8d87e36&state=cMo7LE9IhMYpAyPOy6TjmnhK&hl=ru "Источник")
+
+# Profiling Laravel applications with XDebug and PHPStorm
+
+## Setup | Laravel 11 Project in Docker
 
 Follow the steps below to set up and run this Laravel 11 Project in Docker.
 

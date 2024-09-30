@@ -64,7 +64,7 @@ RUN install-php-extensions xdebug
 ENV PHP_IDE_CONFIG 'serverName=docker-app'
 
 # Добавляет в конфигурационный файл Xdebug строчку, которая включает режим debug. Этот режим нужен для работы с точками останова и другими возможностями отладки.
-RUN echo "xdebug.mode=debug" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+RUN echo "xdebug.mode=develop,debug,profile" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 # Указывает Xdebug начинать отладку автоматически при каждом HTTP-запросе к приложению. Это удобно, когда нужно сразу подключаться к процессу отладки.
 RUN echo "xdebug.start_with_request = yes" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
@@ -80,6 +80,13 @@ RUN echo "xdebug.log=/var/log/xdebug.log" >> /usr/local/etc/php/conf.d/docker-ph
 
 # Настраивает идентификатор (idekey) сессий отладки для связи с PHPStorm. Это ключевое слово, которое Xdebug использует для идентификации конкретной сессии отладки в IDE.
 RUN echo "xdebug.idekey = PHPSTORM" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+
+# По умолчанию файл профайлинга сохраняется в директорию /tmp, чтобы нам было удобнее давайте изменим директорию сохранения на /var/www - в переменной ${DOCKER_BASE_PATH}
+RUN echo "xdebug.output_dir = ${DOCKER_BASE_PATH}" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+
+# Имя выходного файла вместо cachegrind.out.59.gz -> cachegrind.out._user.gz
+RUN echo "xdebug.profiler_output_name = cachegrind.out.%R" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+
 # END Xdebug - *инструкция в файле "INSTALLATION_XDEBUG_PHPSTORM.md"
 
 # Создание рабочей директории - Эта команда устанавливает /var/www/html в качестве рабочей директории для всех последующих команд. Это значит, что все команды, такие как COPY и RUN, будут выполняться в этой директории.
@@ -94,20 +101,20 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
 
 # Установка зависимостей проекта: Эта команда выполняет установку зависимостей, указанных в composer.json, используя Composer.
 # Параметры: --no-dev: Не устанавливать зависимости, указанные в разделе require-dev вашего composer.json. --optimize-autoloader: Оптимизировать автозагрузчик для более быстрого выполнения.
-RUN composer install --no-dev --optimize-autoloader
+#RUN composer install --no-dev --optimize-autoloader
 
 # Копируем .env.example в .env, если .env отсутствует
 # Обновляем команду для проверки наличия .env файла и копирования .env.example
-RUN if [ -f .env.example ] && [ ! -f .env ]; then cp .env.example .env; fi
+#RUN if [ -f .env.example ] && [ ! -f .env ]; then cp .env.example .env; fi
 
 # Настройка прав доступа
 RUN chown -R www-data:www-data storage bootstrap/cache && \
     chmod -R 775 storage bootstrap/cache
 
 # Генерируем ключ приложения и настраиваем кэш
-RUN php artisan key:generate && \
-    php artisan config:clear && \
-    php artisan route:cache
+#RUN php artisan key:generate && \
+    #php artisan config:clear && \
+    #php artisan route:cache
 
 # Эта команда копирует файл laravel.ini в директорию конфигурации PHP, где он будет автоматически загружен и применен PHP-FPM.
 COPY .docker/php/laravel.ini /usr/local/etc/php/conf.d/

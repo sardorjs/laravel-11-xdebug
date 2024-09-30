@@ -8,6 +8,8 @@ Route::get('/', function () {
 
     $randNumber = Arr::random($arr);
 
+    sleep(15);
+
     $text = "The number this time is $randNumber";
 
     return $text;
